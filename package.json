@@ -1,0 +1,16 @@
+{
+  "name": "gasync",
+  "version": "1.0.0",
+  "description": "Easy your async calls, with this library, you can write all your async calls in a flat piece of code instead of nesting callback functions.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "async",
+    "generators",
+    "callbacks"
+  ],
+  "author": "Andy Chen <andy.yx.chen@outlook.com> (http://www.andytech.net/)",
+  "license": "BSD"
+}
