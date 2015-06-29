@@ -1,4 +1,4 @@
-Gasync
+﻿Gasync
 =========
 
 A library to easy you from writing callback functions with generators
