@@ -4,26 +4,35 @@ var Async = function(generator){
 	}
 	
 	this.iterator = generator(this);
+	this.iterator.done = false;
 };
 
 Async.prototype = {
 	run:function(){
-		if(typeof this.iterator === 'undefined' || this.iterator === null){
-			console.log('no iterator.');
-			return false;
+		if(typeof this.iterator === 'undefined' || this.iterator === null || this.iterator.done){
+			return this;
 		}
 		
-		if(this.iterator.done){
-			console.log('it is done.');
-			return false;
-		}else{
-			this.iterator.next(arguments);
-			return true;
+		var result = this.iterator.next(arguments);
+		this.iterator.done = result.done;
+		if(this.iterator.done && (typeof this.continueWith !== 'undefined') && this.continueWith != null){
+			this.continueWith.run();
 		}
+		
+		return this;
 	},
 	more: function(){},
 	callback: function(){
 		return this.run.bind(this);
+	},
+	then: function(async){
+		var task = this;
+		while((typeof task.continueWith !== 'undefined') && task.continueWith !== null){
+			task = task.continueWith;
+		}
+		
+		task.continueWith = async;
+		return this;
 	}
 };
 
