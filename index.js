@@ -3,13 +3,17 @@ var Async = function(generator){
 		throw new Error('A GeneratorFunction is required.');
 	}
 	
-	this.iterator = generator(this);
-	this.iterator.done = false;
+	this.generator = generator;
 };
 
 Async.prototype = {
 	run:function(){
-		if(typeof this.iterator === 'undefined' || this.iterator === null || this.iterator.done){
+		if(typeof this.iterator === 'undefined' || this.iterator === null){
+			this.iterator = this.generator(this);
+			this.iterator.done = false;
+		}
+		
+		if(typeof this.iterator.done !== 'undefined' && this.iterator.done){
 			return this;
 		}
 		
@@ -19,6 +23,18 @@ Async.prototype = {
 			this.continueWith.run();
 		}
 		
+		return this;
+	},
+	bind: function(obj, args){
+		var _args = [this];
+		if(typeof args !== 'undefined' && typeof args.length !== 'undefined'){
+			for(var i = 0; i < args.length; ++i){
+				_args.push(args[i]);
+			}
+		}
+		
+		this.iterator = this.generator.apply(obj, _args);
+		this.iterator.done = false;
 		return this;
 	},
 	more: function(){},
