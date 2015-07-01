@@ -1,6 +1,6 @@
 {
   "name": "gasync",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Easy your async calls, with this library, you can write all your async calls in a flat piece of code instead of nesting callback functions.",
   "main": "index.js",
   "scripts": {
