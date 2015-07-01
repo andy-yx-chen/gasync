@@ -28,50 +28,30 @@ HttpResponse.prototype = {
 		this.callback(this.message);
 	}
 };
-new Async(function *(async){
-	var options = {
-		host: 'www.google.com',
-		port: 80,
-		path: '/',
-		method: 'GET'
-	};
-	var response = yield http.request(options, async.callback()).end();
-	var res = response[0];
-	console.log('Status: ' + res.statusCode);
-	console.log('HEADERS: ' + JSON.stringify(res.headers));
-	res.setEncoding('utf8');
-	var chunk = yield new HttpResponse(res).read(async.callback());
-	console.log(chunk[0]);
-})
-.then(new Async(function *(async){
-	var options = {
-		host: 'www.bing.com',
-		port: 80,
-		path: '/',
-		method: 'GET'
-	};
-	var response = yield http.request(options, async.callback()).end();
-	var res = response[0];
-	console.log('Status: ' + res.statusCode);
-	console.log('HEADERS: ' + JSON.stringify(res.headers));
-	res.setEncoding('utf8');
-	var chunk = yield new HttpResponse(res).read(async.callback());
-	console.log(chunk[0]);
-}))
-.then(new Async(function *(async){
-	var options = {
-		host: 'www.andytech.net',
-		port: 80,
-		path: '/index.html',
-		method: 'GET'
-	};
-	var response = yield http.request(options, async.callback()).end();
-	var res = response[0];
-	console.log('Status: ' + res.statusCode);
-	console.log('HEADERS: ' + JSON.stringify(res.headers));
-	res.setEncoding('utf8');
-	var chunk = yield new HttpResponse(res).read(async.callback());
-	console.log(chunk[0]);
-}))
-.run();
+var HttpClient = function(writer){
+	this.writer = writer;
+};
 
+HttpClient.prototype = {
+	get: function*(async, host, port, path){
+		var options = {
+			host: host,
+			port: port,
+			path: path,
+			method: 'GET'
+		};
+		var response = yield http.request(options, async.callback()).end();
+		var res = response[0];
+		this.writer('Status: ' + res.statusCode);
+		this.writer('HEADERS: ' + JSON.stringify(res.headers));
+		res.setEncoding('utf8');
+		var chunk = yield new HttpResponse(res).read(async.callback());
+		this.writer(chunk[0]);
+	}
+};
+
+var httpClient = new HttpClient(console.log);
+new Async(httpClient.get).bind(httpClient, ['www.google.com', 80, '/'])
+.then(new Async(httpClient.get).bind(httpClient, ['www.bing.com', 80, '/']))
+.then(new Async(httpClient.get).bind(httpClient, ['www.andytech.net', 80, '/index.html']))
+.run();
